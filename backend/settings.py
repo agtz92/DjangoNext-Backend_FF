@@ -62,6 +62,8 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://django-next-frontend-ff.vercel.app/customers/"
+
 ]
 
 ROOT_URLCONF = 'backend.urls'
