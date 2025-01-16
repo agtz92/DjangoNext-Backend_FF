@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Update Order #{{ order.id }}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Update Order: #{{ order.id }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Order Form -->
+        <h3>Order Details</h3>
+        {{ order_form.as_p }}
+
+        <!-- Order Items Formset -->
+        <h3>Order Items</h3>
+        {{ formset.management_form }}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                <tr>
+                    <td>{{ form.id }}</td>
+                    <td>{{ form.product }}</td>
+                    <td>{{ form.quantity }}</td>
+                    <td>{{ form.price }}</td>
+                    <td>{{ form.DELETE }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <a href="{% url 'order_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

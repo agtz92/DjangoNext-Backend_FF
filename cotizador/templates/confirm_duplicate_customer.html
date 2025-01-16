@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Confirm Duplicate Customer
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Duplicate Customer: {{ customer.name }}</h1>
+    <p>
+        Are you sure you want to duplicate this customer?
+        <br>
+        The new customer will need a unique email or additional modifications after duplication.
+    </p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Yes, Duplicate</button>
+        <a href="{% url 'customer_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

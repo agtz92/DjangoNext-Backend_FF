@@ -1,0 +1,20 @@
+<!-- order_list.html -->
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Orders</h1>
+  
+  <div class="order-list">
+    {% for order in orders %}
+      <div class="order">
+        <!-- Link to the detailed order page -->
+        <h3>
+          <a href="{% url 'order_detail' order.id %}">
+            Order #{{ order.id }} (Customer: {{ order.customer }})
+          </a>
+        </h3>
+        <hr>
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

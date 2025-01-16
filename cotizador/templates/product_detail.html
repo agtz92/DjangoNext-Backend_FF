@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ product.name }}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ product.name }}</h1>
+    <div class="product-details">
+        <p><strong>SKU:</strong> {{ product.sku }}</p>
+        <p><strong>Description:</strong> {{ product.description|default:"No description available." }}</p>
+        <p><strong>Base Price:</strong> ${{ product.base_price }}</p>
+        <p><strong>Created At:</strong> {{ product.created_at|date:"F d, Y H:i" }}</p>
+        <p><strong>Updated At:</strong> {{ product.updated_at|date:"F d, Y H:i" }}</p>
+    </div>
+    <div style="margin-top: 20px;">
+        <a href="{% url 'update_product' product.sku %}" class="btn btn-warning">Edit Product</a>
+        <a href="{% url 'duplicate_product' product.sku %}" class="btn btn-secondary">Duplicate</a>
+        <a href="{% url 'delete_product' product.sku %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'product_list' %}" class="btn btn-secondary">Back to Product List</a>
+    </div>
+</div>
+{% endblock %}

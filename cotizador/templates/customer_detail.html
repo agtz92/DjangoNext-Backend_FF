@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ customer.name }}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ customer.name }}</h1>
+    <div class="customer-details">
+        <p><strong>ID:</strong> {{ customer.id }}</p>
+        <p><strong>Email:</strong> {{ customer.email }}</p>
+        <p><strong>Phone:</strong> {{ customer.phone|default:"Not provided" }}</p>
+        <p><strong>Created At:</strong> {{ customer.created_at|date:"F d, Y H:i" }}</p>
+        <p><strong>Updated At:</strong> {{ customer.updated_at|date:"F d, Y H:i" }}</p>
+    </div>
+    <div style="margin-top: 20px;">
+        <a href="{% url 'update_customer' customer.pk %}" class="btn btn-warning">Edit Customer</a>
+        <a href="{% url 'duplicate_customer' customer.pk %}" class="btn btn-info">Duplicate</a>
+        <a href="{% url 'delete_customer' customer.pk %}" class="btn btn-danger">Delete</a>
+        <a href="{% url 'customer_list' %}" class="btn btn-secondary">Back to Customer List</a>
+    </div>
+</div>
+{% endblock %}

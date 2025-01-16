@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Customers List
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Customers List</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+            </tr>
+        </thead>
+        <a href="{% url 'add_customer' %}" class="btn btn-primary" style="margin-bottom: 15px;">
+            Add New Customer
+        </a>
+        <tbody>
+            {% for customer in customers %}
+            <tr>
+                <td>
+                    <a href="{% url 'customer_detail' customer.id %}">
+                        {{ customer.name }}
+                    </a>
+                </td>
+                <td>{{ customer.email|default:"No email available" }}</td>
+                <td>{{ customer.phone }}</td>
+                <td>
+                    <a href="{% url 'update_customer' customer.pk %}" class="btn btn-warning">Edit</a>
+                </td>
+                <td>
+                    <a href="{% url 'duplicate_customer' customer.pk %}" class="btn btn-info">Duplicate</a>
+                </td>
+                <td>
+                    <a href="{% url 'delete_customer' customer.pk %}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No customers available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

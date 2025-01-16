@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Company List
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Company List</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Business Line</th>
+                <th>State</th>
+            </tr>
+        </thead>
+        <a href="{% url 'add_company' %}" class="btn btn-primary" style="margin-bottom: 15px;">
+            Add New Company
+        </a>
+        <tbody>
+            {% for company in companies %}
+            <tr>
+                <td>
+                    <a href="{% url 'company_detail' company.id %}">
+                        {{ company.name }}
+                    </a>
+                </td>
+                <td>{{ company.business_line|default:"No business line available" }}</td>
+                <td>{{ company.state }}</td>
+                <td>
+                    <a href="{% url 'update_company' company.pk %}" class="btn btn-warning">Edit</a>
+                </td>
+                <td>
+                    <a href="{% url 'delete_company' company.pk %}" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">No companies available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

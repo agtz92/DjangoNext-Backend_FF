@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Company Details
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Company Details</h1>
+    <p><strong>ID:</strong> {{ company.id }}</p>
+    <p><strong>Name:</strong> {{ company.name }}</p>
+    <p><strong>Business Line:</strong> {{ company.business_line }}</p>
+    <a href="{% url 'update_company' company.id %}" class="btn btn-warning">Edit</a>
+    <a href="{% url 'company_list' %}" class="btn btn-secondary">Back to List</a>
+</div>
+{% endblock %}

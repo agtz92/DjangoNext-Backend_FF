@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Confirm Duplicate Order
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Duplicate Order #{{ order.id }}</h1>
+    <p>Are you sure you want to duplicate this order?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-primary">Yes, Duplicate</button>
+        <a href="{% url 'order_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

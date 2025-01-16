@@ -1,0 +1,54 @@
+{% extends "base.html" %} 
+
+{% block title %} 
+    Order #{{ order.id }} 
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1>Order #{{ order.id }}</h1>
+  <div class="order-details">
+    <p><strong>Customer:</strong> {{ order.customer.name }}</p>
+    <p><strong>Order Date:</strong> {{ order.created_at|date:"F d, Y H:i" }}</p>
+    <p><strong>Last Updated:</strong> {{ order.updated_at|date:"F d, Y H:i" }}</p>
+  </div>
+
+  <h2>Items</h2>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>SKU</th>  <!-- Add a column for SKU -->
+        <th>Quantity</th>
+        <th>Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in order.items.all %}
+      <tr>
+        <td>{{ item.product.name }}</td>
+        <td>{{ item.product.sku }}</td>  <!-- Display the SKU -->
+        <td>{{ item.quantity }}</td>
+        <td>${{ item.price }}</td>
+        <td>${{ item.get_total_price }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="5">No items in this order.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h3>Total Price: ${{ order.get_total_price }}</h3>
+
+  <!-- Buttons -->
+  <div class="mt-4">
+    <a href="{% url 'update_order' order.pk %}" class="btn btn-warning">Update Order</a>
+    <a href="{% url 'duplicate_order' order.id %}" class="btn btn-info">Duplicate Order</a>
+    <a href="{% url 'delete_order' order.pk %}" class="btn btn-danger">Delete</a>
+    <a href="{% url 'order_list' %}" class="btn btn-secondary">Back to Order List</a>
+  </div>
+</div>
+{% endblock %}
