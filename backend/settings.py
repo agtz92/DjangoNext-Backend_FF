@@ -43,9 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "graphene_django",
-    'cotizador',
+    'cotizador', #FF
     'corsheaders', #to interact with Nextjs
-    'rest_framework',#to interact with Nextjs
+    'rest_framework',#to interact with Nextjs change no es necesario ya
     
 ]
 
