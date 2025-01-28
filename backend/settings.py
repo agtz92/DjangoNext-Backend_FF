@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from gqlauth.settings_type import GqlAuthSettings
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'strawberry_django',  # Replace graphene_django with strawberry.django
+    'gqlauth',
     'cotizador',  # FF
     'corsheaders',  # To interact with Next.js
     'rest_framework',  # To interact with Next.js (optional, if not needed, can be removed)
@@ -55,6 +57,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'gqlauth.core.middlewares.django_jwt_middleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -63,6 +66,17 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://django-next-frontend-ff.vercel.app"
 ]
+
+AUTH_USER_MODEL = 'cotizador.CustomUser'
+
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+GQL_AUTH = GqlAuthSettings(
+    LOGIN_REQUIRE_CAPTCHA=False,
+    REGISTER_REQUIRE_CAPTCHA=False,
+)
 
 ROOT_URLCONF = 'backend.urls'
 

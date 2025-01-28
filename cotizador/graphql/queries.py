@@ -1,4 +1,5 @@
 import strawberry
+from asgiref.sync import sync_to_async
 from cotizador.models import (
     Company, Product, Customer, CustomerTier, CustomerSpecificPrice, Order, OrderItem
 )
@@ -7,62 +8,64 @@ from .types import (
     CustomerSpecificPriceType, OrderType, OrderItemType
 )
 
+
 @strawberry.type
 class Query:
     @strawberry.field
-    def companies(self) -> list[CompanyType]:
-        return Company.objects.all()
+    async def companies(self) -> list[CompanyType]:
+        return await sync_to_async(list)(Company.objects.all())  # Fix async context
 
     @strawberry.field
-    def company(self, id: strawberry.ID) -> CompanyType | None:
+    async def company(self, id: strawberry.ID) -> CompanyType | None:
         try:
-            return Company.objects.get(pk=id)
+            return await sync_to_async(Company.objects.get)(pk=id)  # Fix async context
         except Company.DoesNotExist:
             return None
 
     @strawberry.field
-    def products(self) -> list[ProductType]:
-        return Product.objects.all()
+    async def products(self) -> list[ProductType]:
+        return await sync_to_async(list)(Product.objects.all())
 
     @strawberry.field
-    def product(self, sku: str) -> ProductType | None:
+    async def product(self, sku: str) -> ProductType | None:
         try:
-            return Product.objects.get(sku=sku)
+            return await sync_to_async(Product.objects.get)(sku=sku)
         except Product.DoesNotExist:
             return None
 
     @strawberry.field
-    def customers(self) -> list[CustomerType]:
-        return Customer.objects.all()
+    async def customers(self) -> list[CustomerType]:
+        return await sync_to_async(list)(Customer.objects.all())
 
     @strawberry.field
-    def customer(self, id: strawberry.ID) -> CustomerType | None:
+    async def customer(self, id: strawberry.ID) -> CustomerType | None:
         try:
-            return Customer.objects.get(id=id)
+            return await sync_to_async(Customer.objects.get)(id=id)
         except Customer.DoesNotExist:
             return None
 
     @strawberry.field
-    def customer_tiers(self) -> list[CustomerTierType]:
-        return CustomerTier.objects.all()
+    async def customer_tiers(self) -> list[CustomerTierType]:
+        return await sync_to_async(list)(CustomerTier.objects.all())
 
     @strawberry.field
-    def customer_specific_prices(self) -> list[CustomerSpecificPriceType]:
-        return CustomerSpecificPrice.objects.all()
+    async def customer_specific_prices(self) -> list[CustomerSpecificPriceType]:
+        return await sync_to_async(list)(CustomerSpecificPrice.objects.all())
 
     @strawberry.field
-    def orders(self) -> list[OrderType]:
-        return Order.objects.all()
+    async def orders(self) -> list[OrderType]:
+        return await sync_to_async(list)(Order.objects.all())
 
     @strawberry.field
-    def order(self, id: strawberry.ID) -> OrderType | None:
+    async def order(self, id: strawberry.ID) -> OrderType | None:
         try:
-            return Order.objects.get(id=id)
+            return await sync_to_async(Order.objects.get)(id=id)
         except Order.DoesNotExist:
             return None
 
     @strawberry.field
-    def order_items(self) -> list[OrderItemType]:
-        return OrderItem.objects.all()
+    async def order_items(self) -> list[OrderItemType]:
+        return await sync_to_async(list)(OrderItem.objects.all())
+
 
 schema = strawberry.Schema(query=Query)
