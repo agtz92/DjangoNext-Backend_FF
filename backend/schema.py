@@ -1,13 +1,16 @@
-import graphene
+import strawberry
 from cotizador.graphql.queries import Query as CotizadorQuery
 from cotizador.graphql.mutations import Mutation as CotizadorMutation
 
-class Query(CotizadorQuery, graphene.ObjectType):
+
+@strawberry.type
+class Query(CotizadorQuery):
     pass
 
-class Mutation(CotizadorMutation, graphene.ObjectType):
+
+@strawberry.type
+class Mutation(CotizadorMutation):
     pass
 
 
-
-schema = graphene.Schema(query=Query, mutation=Mutation)
+schema = strawberry.Schema(query=Query, mutation=Mutation)

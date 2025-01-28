@@ -1,318 +1,168 @@
-import graphene
-from .types import ProductType, OrderType, OrderItemType, CustomerType, CompanyType
+import strawberry
+from strawberry.types import Info
 from cotizador.models import Product, Order, OrderItem, Customer, Company
 from django.db import IntegrityError
+from .types import ProductType, OrderType, OrderItemType, CustomerType, CompanyType
 
-class CreateProduct(graphene.Mutation):
-    class Arguments:
-        name = graphene.String(required=True)
-        description = graphene.String()
-        sku = graphene.String(required=True)
-        base_price = graphene.Decimal(required=True)
 
-    product = graphene.Field(ProductType)
+@strawberry.input
+class OrderItemInput:
+    product: strawberry.ID
+    quantity: int
+    price: float
 
-    @classmethod
-    def mutate(cls, root, info, name, sku, base_price, description=None):
-        product = Product.objects.create(
-            name=name,
-            description=description,
-            sku=sku,
-            base_price=base_price,
-        )
-        return CreateProduct(product=product)
 
-class UpdateProduct(graphene.Mutation):
-    class Arguments:
-        id = graphene.ID(required=True)
-        name = graphene.String()
-        description = graphene.String()
-        sku = graphene.String()
-        base_price = graphene.Decimal()
+@strawberry.type
+class CreateProductResponse:
+    success: bool
+    product: ProductType | None = None
+    message: str | None = None
 
-    product = graphene.Field(ProductType)
 
-    @classmethod
-    def mutate(cls, root, info, id, **kwargs):
+@strawberry.type
+class Mutation:
+    @strawberry.mutation
+    def create_product(
+        self, info: Info, name: str, sku: str, base_price: float, description: str | None = None
+    ) -> CreateProductResponse:
+        try:
+            product = Product.objects.create(
+                name=name, description=description, sku=sku, base_price=base_price
+            )
+            return CreateProductResponse(success=True, product=product)
+        except Exception as e:
+            return CreateProductResponse(success=False, message=f"Error: {str(e)}")
+
+    @strawberry.mutation
+    def update_product(
+        self, info: Info, id: strawberry.ID, name: str | None = None, 
+        description: str | None = None, sku: str | None = None, base_price: float | None = None
+    ) -> CreateProductResponse:
         try:
             product = Product.objects.get(pk=id)
-            for key, value in kwargs.items():
-                if value is not None:
-                    setattr(product, key, value)
+            if name is not None:
+                product.name = name
+            if description is not None:
+                product.description = description
+            if sku is not None:
+                product.sku = sku
+            if base_price is not None:
+                product.base_price = base_price
             product.save()
-            return UpdateProduct(product=product)
+            return CreateProductResponse(success=True, product=product)
         except Product.DoesNotExist:
-            raise Exception("Product not found")
-class DeleteProduct(graphene.Mutation):
-    class Arguments:
-        id = graphene.ID(required=True)
+            return CreateProductResponse(success=False, message="Product not found")
 
-    success = graphene.Boolean()
-
-    @classmethod
-    def mutate(cls, root, info, id):
+    @strawberry.mutation
+    def delete_product(self, info: Info, id: strawberry.ID) -> bool:
         try:
             product = Product.objects.get(pk=id)
             product.delete()
-            return DeleteProduct(success=True)
+            return True
         except Product.DoesNotExist:
-            raise Exception("Product not found")
-class OrderItemInput(graphene.InputObjectType):
-    product = graphene.ID(required=True)
-    quantity = graphene.Int(required=True)
-    price = graphene.Decimal(required=True)
+            return False
 
-
-class CreateOrder(graphene.Mutation):
-    class Arguments:
-        customer_id = graphene.ID(required=True)
-        items = graphene.List(OrderItemInput, required=True)
-
-    success = graphene.Boolean()
-    order = graphene.Field(OrderType)
-
-    @classmethod
-    def mutate(cls, root, info, customer_id, items):
+    @strawberry.mutation
+    def create_order(
+        self, info: Info, customer_id: strawberry.ID, items: list[OrderItemInput]
+    ) -> OrderType | None:
         try:
-            # Fetch customer
             customer = Customer.objects.get(pk=customer_id)
-
-            # Create the order
             order = Order.objects.create(customer=customer)
 
-            # Create the order items
-            order_items = []
-            for item in items:
-                try:
-                    product = Product.objects.get(pk=item.product)
-                    order_item = OrderItem(
-                        order=order,
-                        product=product,
-                        quantity=item.quantity,
-                        price=item.price,
-                    )
-                    order_items.append(order_item)
-                except Product.DoesNotExist:
-                    raise Exception(f"Product with ID {item.product} does not exist")
-
+            order_items = [
+                OrderItem(
+                    order=order,
+                    product=Product.objects.get(pk=item.product),
+                    quantity=item.quantity,
+                    price=item.price,
+                )
+                for item in items
+            ]
             OrderItem.objects.bulk_create(order_items)
 
-            return CreateOrder(success=True, order=order)
-
+            return order
         except Customer.DoesNotExist:
             raise Exception("Customer not found")
-        
-class DeleteOrder(graphene.Mutation):
-    class Arguments:
-        id = graphene.ID(required=True)  # ID of the order to be deleted
+        except Product.DoesNotExist as e:
+            raise Exception(f"Product not found: {str(e)}")
 
-    success = graphene.Boolean()
-    message = graphene.String()
-
-    @classmethod
-    def mutate(cls, root, info, id):
+    @strawberry.mutation
+    def delete_order(self, info: Info, id: strawberry.ID) -> bool:
         try:
-            # Fetch the order
             order = Order.objects.get(pk=id)
-            
-            # Delete the order
             order.delete()
-            
-            return DeleteOrder(success=True, message="Order deleted successfully.")
+            return True
+        except Order.DoesNotExist:
+            return False
+
+    @strawberry.mutation
+    def duplicate_order(self, info: Info, id: strawberry.ID) -> OrderType | None:
+        try:
+            original_order = Order.objects.get(pk=id)
+            new_order = Order.objects.create(customer=original_order.customer)
+            order_items = [
+                OrderItem(
+                    order=new_order,
+                    product=item.product,
+                    quantity=item.quantity,
+                    price=item.price,
+                )
+                for item in original_order.items.all()
+            ]
+            OrderItem.objects.bulk_create(order_items)
+            return new_order
         except Order.DoesNotExist:
             raise Exception("Order not found")
 
-class DuplicateOrder(graphene.Mutation):
-    class Arguments:
-        id = graphene.ID(required=True)  # ID of the order to be duplicated
-
-    success = graphene.Boolean()
-    new_order = graphene.Field(OrderType)
-
-    @classmethod
-    def mutate(cls, root, info, id):
+    @strawberry.mutation
+    def update_order(
+        self, info: Info, id: strawberry.ID, customer_id: strawberry.ID | None = None, 
+        items: list[OrderItemInput] | None = None
+    ) -> OrderType | None:
         try:
-            # Fetch the original order
-            original_order = Order.objects.get(pk=id)
-
-            # Duplicate the order
-            new_order = Order.objects.create(customer=original_order.customer)
-
-            # Duplicate the items associated with the order
-            new_order_items = []
-            for item in original_order.items.all():
-                new_order_items.append(
+            order = Order.objects.get(pk=id)
+            if customer_id:
+                customer = Customer.objects.get(pk=customer_id)
+                order.customer = customer
+            if items:
+                order.items.all().delete()
+                order_items = [
                     OrderItem(
-                        order=new_order,
-                        product=item.product,
+                        order=order,
+                        product=Product.objects.get(pk=item.product),
                         quantity=item.quantity,
                         price=item.price,
                     )
-                )
-            OrderItem.objects.bulk_create(new_order_items)
-
-            return DuplicateOrder(success=True, new_order=new_order)
-
-        except Order.DoesNotExist:
-            raise Exception("Order not found")
-
-class UpdateOrder(graphene.Mutation):
-    class Arguments:
-        id = graphene.ID(required=True)  # ID of the order to be updated
-        customer_id = graphene.ID()  # New customer ID (optional)
-        items = graphene.List(OrderItemInput)  # Updated order items (optional)
-
-    success = graphene.Boolean()
-    message = graphene.String()
-    updated_order = graphene.Field(OrderType)
-
-    @classmethod
-    def mutate(cls, root, info, id, customer_id=None, items=None):
-        try:
-            # Fetch the order to be updated
-            order = Order.objects.get(pk=id)
-
-            # Update the customer if a new customer ID is provided
-            if customer_id:
-                try:
-                    customer = Customer.objects.get(pk=customer_id)
-                    order.customer = customer
-                except Customer.DoesNotExist:
-                    raise Exception(f"Customer with ID {customer_id} does not exist")
-
+                    for item in items
+                ]
+                OrderItem.objects.bulk_create(order_items)
             order.save()
-
-            # Update the items if provided
-            if items:
-                # Clear existing items and replace them with new ones
-                order.items.all().delete()
-                new_items = []
-                for item in items:
-                    try:
-                        product = Product.objects.get(pk=item.product)
-                        new_items.append(
-                            OrderItem(
-                                order=order,
-                                product=product,
-                                quantity=item.quantity,
-                                price=item.price,
-                            )
-                        )
-                    except Product.DoesNotExist:
-                        raise Exception(f"Product with ID {item.product} does not exist")
-
-                OrderItem.objects.bulk_create(new_items)
-
-            return UpdateOrder(
-                success=True,
-                message="Order updated successfully.",
-                updated_order=order,
-            )
-
+            return order
         except Order.DoesNotExist:
             raise Exception("Order not found")
+        except Customer.DoesNotExist:
+            raise Exception("Customer not found")
+        except Product.DoesNotExist as e:
+            raise Exception(f"Product not found: {str(e)}")
 
-class CreateCustomer(graphene.Mutation):
-    class Arguments:
-        name = graphene.String(required=True)
-        email = graphene.String(required=True)
-        phone = graphene.String(required=False)
-        company_id = graphene.ID(required=False)  # Associate with a company (optional)
-
-    customer = graphene.Field(CustomerType)
-    success = graphene.Boolean()
-    message = graphene.String()
-
-    @classmethod
-    def mutate(cls, root, info, name, email, phone=None, company_id=None):
+    @strawberry.mutation
+    def create_customer(
+        self, info: Info, name: str, email: str, phone: str | None = None, 
+        company_id: strawberry.ID | None = None
+    ) -> CustomerType | None:
         try:
-            # Check if the company exists (if provided)
-            company = None
-            if company_id:
-                try:
-                    company = Company.objects.get(pk=company_id)
-                except Company.DoesNotExist:
-                    return CreateCustomer(
-                        success=False,
-                        message=f"Company with ID {company_id} does not exist.",
-                        customer=None,
-                    )
-
-            # Create the customer
-            customer = Customer.objects.create(
-                name=name,
-                email=email,
-                phone=phone,
-                company=company,
-            )
-            return CreateCustomer(
-                success=True,
-                message="Customer created successfully.",
-                customer=customer,
-            )
+            company = Company.objects.get(pk=company_id) if company_id else None
+            customer = Customer.objects.create(name=name, email=email, phone=phone, company=company)
+            return customer
+        except Company.DoesNotExist:
+            raise Exception("Company not found")
         except IntegrityError:
-            return CreateCustomer(
-                success=False,
-                message=f"A customer with the email '{email}' already exists.",
-                customer=None,
-            )
-        except Exception as e:
-            return CreateCustomer(
-                success=False,
-                message=f"An unexpected error occurred: {str(e)}",
-                customer=None,
-            )
-        
-class CreateCompany(graphene.Mutation):
-    class Arguments:
-        name = graphene.String(required=True)
-        business_line = graphene.String(required=True)
-        state = graphene.String(required=True)
+            raise Exception("A customer with this email already exists.")
 
-    company = graphene.Field(CompanyType)
-    success = graphene.Boolean()
-    message = graphene.String()
-
-    @classmethod
-    def mutate(cls, root, info, name, business_line, state):
+    @strawberry.mutation
+    def create_company(self, info: Info, name: str, business_line: str, state: str) -> CompanyType | None:
         try:
-            company = Company.objects.create(
-                name=name,
-                business_line=business_line,
-                state=state,
-            )
-            return CreateCompany(
-                success=True,
-                message="Company created successfully.",
-                company=company,
-            )
+            return Company.objects.create(name=name, business_line=business_line, state=state)
         except IntegrityError:
-            return CreateCompany(
-                success=False,
-                message=f"A company with the name '{name}' already exists.",
-                company=None,  # Explicitly set company to None
-            )
-        except Exception as e:
-            # Handle other exceptions
-            return CreateCompany(
-                success=False,
-                message=f"An unexpected error occurred: {str(e)}",
-                company=None,  # Explicitly set company to None
-            )
-        
-    
-
-class Mutation(graphene.ObjectType):
-    create_company = CreateCompany.Field()
-    create_customer = CreateCustomer.Field()
-    create_product = CreateProduct.Field()
-    update_product = UpdateProduct.Field()
-    delete_product = DeleteProduct.Field()
-    create_order = CreateOrder.Field()
-    delete_order = DeleteOrder.Field()
-    duplicate_order = DuplicateOrder.Field()
-    update_order = UpdateOrder.Field()
-
-
-
-
+            raise Exception("A company with this name already exists.")

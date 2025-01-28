@@ -42,17 +42,16 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "graphene_django",
-    'cotizador', #FF
-    'corsheaders', #to interact with Nextjs
-    'rest_framework',#to interact with Nextjs change no es necesario ya
-    
+    'strawberry_django',  # Replace graphene_django with strawberry.django
+    'cotizador',  # FF
+    'corsheaders',  # To interact with Next.js
+    'rest_framework',  # To interact with Next.js (optional, if not needed, can be removed)
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',  #to interact with Nextjs
+    'corsheaders.middleware.CorsMiddleware',  # To interact with Next.js
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -63,7 +62,6 @@ MIDDLEWARE = [
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "https://django-next-frontend-ff.vercel.app"
-
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -148,6 +146,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-GRAPHENE = {
-    "SCHEMA": "backend.schema.schema"
-}
+
+# Strawberry Configuration
+# This is the updated configuration for Strawberry GraphQL
+STRAWBERRY_SCHEMA = "backend.schema.schema"  # Point to your Strawberry schema
