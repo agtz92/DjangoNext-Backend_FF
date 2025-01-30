@@ -37,17 +37,23 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    # Django deps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Third party deps
+    'corsheaders',  # To interact with Next.js
+    'strawberry',
     'strawberry_django',  # Replace graphene_django with strawberry.django
     'gqlauth',
-    'cotizador',  # FF
-    'corsheaders',  # To interact with Next.js
     'rest_framework',  # To interact with Next.js (optional, if not needed, can be removed)
+
+    # Local apps
+    'cotizador',
 ]
 
 MIDDLEWARE = [
@@ -115,6 +121,9 @@ DATABASES = {
     }
 }
 
+AUTHENTICATION_BACKENDS = [
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -134,6 +143,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+GQL_AUTH = GqlAuthSettings(
+    LOGIN_REQUIRE_CAPTCHA=False,
+    REGISTER_REQUIRE_CAPTCHA=False,
+)
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

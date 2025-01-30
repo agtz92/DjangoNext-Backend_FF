@@ -13,10 +13,9 @@ class CompanyType:
     state: str
     created_at: str
     updated_at: str
-    customers: list["CustomerType"] = strawberry.field()
 
     @strawberry.field
-    def resolve_customers(self) -> list["CustomerType"]:
+    def customers(self) -> list["CustomerType"]:
         return self.customers.all()
 
 
