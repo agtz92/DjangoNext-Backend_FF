@@ -13,6 +13,7 @@ class CompanyType:
     state: str
     created_at: str
     updated_at: str
+    # unnecessary customers: list["CustomerType"] = strawberry.field()
 
     @strawberry.field
     def customers(self) -> list["CustomerType"]:

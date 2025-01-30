@@ -2,7 +2,7 @@
     "clientName": "Thunder Client",
     "collectionName": "DjangoNext",
     "collectionId": "a26b810f-77cc-453c-b1af-57592f0a4b69",
-    "dateExported": "2025-01-30T02:07:37.771Z",
+    "dateExported": "2025-01-30T02:55:02.310Z",
     "version": "1.2",
     "folders": [
         {
@@ -30,7 +30,7 @@
             "method": "POST",
             "sortNum": 10000,
             "created": "2025-01-30T00:50:40.766Z",
-            "modified": "2025-01-30T01:24:25.015Z",
+            "modified": "2025-01-30T02:52:26.828Z",
             "headers": [],
             "body": {
                 "type": "graphql",
@@ -39,6 +39,11 @@
                 "graphql": {
                     "query": "query {\n    me {\n        id\n        username\n        firstName\n        lastName\n        isActive\n        email\n        verified\n    }\n}"
                 }
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoie1xuIFwiZXhwXCI6IFwiMjAyNS0wMS0zMC0wMi01Ny0xNy0rMDAwMFwiLFxuIFwib3JpZ0lhdFwiOiBcIjIwMjUtMDEtMzAtMDItNTItMTctKzAwMDBcIixcbiBcInVzZXJuYW1lXCI6IFwiZGFuaWVsXCJcbn0ifQ.SxNDzC5U4wjcEgbsYlXVvGi9iU4KV9xGvJrOCTtfbH0",
+                "bearerPrefix": "JWT"
             }
         },
         {
@@ -71,15 +76,20 @@
             "method": "POST",
             "sortNum": 30000,
             "created": "2025-01-30T01:43:50.219Z",
-            "modified": "2025-01-30T01:45:05.534Z",
+            "modified": "2025-01-30T02:54:53.502Z",
             "headers": [],
             "body": {
                 "type": "graphql",
                 "raw": "",
                 "form": [],
                 "graphql": {
-                    "query": "\nquery companies {\n  companies {\n    id\n    name\n    businessLine\n    state\n    createdAt\n    updatedAt\n  }\n}"
+                    "query": "\nquery companies {\n  companies {\n    id\n    name\n    businessLine\n    state\n    createdAt\n    updatedAt\n    customers {\n        id\n        email\n    }\n  }\n}"
                 }
+            },
+            "auth": {
+                "type": "bearer",
+                "bearer": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJwYXlsb2FkIjoie1xuIFwiZXhwXCI6IFwiMjAyNS0wMS0zMC0wMi01Ny0xNy0rMDAwMFwiLFxuIFwib3JpZ0lhdFwiOiBcIjIwMjUtMDEtMzAtMDItNTItMTctKzAwMDBcIixcbiBcInVzZXJuYW1lXCI6IFwiZGFuaWVsXCJcbn0ifQ.SxNDzC5U4wjcEgbsYlXVvGi9iU4KV9xGvJrOCTtfbH0",
+                "bearerPrefix": "JWT"
             }
         }
     ],
@@ -88,5 +98,5 @@
             "baseUrl": "http://localhost:8000/gql/"
         }
     },
-    "ref": "eCMZ4iBwJKlKXA5mQaQ6l412OcpUdfxOjunwzzoqZa2ffuUAYAqgsLJpysfwmZxkjyBdGjiU-1rFBN0-g6h6-g"
+    "ref": "eCMZ4iBwJKlKXA5mQaQ6l412OcpUdfxOjunwzzoqZa3Vc6L0z3NE_X65LW7EY4j21T6b9ZAu5HJFlifKPJmluQ"
 }

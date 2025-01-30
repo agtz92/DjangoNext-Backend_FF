@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from strawberry.django.views import GraphQLView
+from strawberry.django.views import AsyncGraphQLView
 from django.views.decorators.csrf import csrf_exempt
 from django.urls import path, include
 from django.conf import settings
@@ -24,8 +24,8 @@ from backend.schema import schema  # Import your Strawberry schema
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("graphql", csrf_exempt(GraphQLView.as_view(schema=schema, graphql_ide="graphiql"))),
-    path("gql", csrf_exempt(GraphQLView.as_view(schema=schema, graphql_ide=None))),
+    path("graphql", csrf_exempt(AsyncGraphQLView.as_view(schema=schema, graphql_ide="graphiql"))),
+    path("gql", csrf_exempt(AsyncGraphQLView.as_view(schema=schema, graphql_ide=None))),
     path("", include("cotizador.urls")),
 ]
 
