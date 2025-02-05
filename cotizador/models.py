@@ -11,12 +11,6 @@ class CustomUser(AbstractUser):
     EMAIL_FIELD = "email"         # e.g: "email", "primary_email"
 
 class Company(models.Model):
-    id = models.CharField(
-        max_length=255, 
-        primary_key=True, 
-        default=uuid.uuid4,  # Automatically generate a UUID for new instances
-        editable=False
-    )
     name = models.CharField(max_length=255, unique=True)
     business_line = models.CharField(max_length=255)
     state = models.CharField(max_length=100)  # Text field for country state
@@ -96,6 +90,9 @@ class Order(models.Model):
     def get_total_price(self):
         total = sum(item.quantity * item.price for item in self.items.all())
         return total
+    @property
+    def total_price(self):
+        return self.get_total_price()
 
     def __str__(self):
         return f"Order #{self.id} by {self.customer.name}"
