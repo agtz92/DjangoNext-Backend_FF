@@ -70,6 +70,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "http://127.0.0.1:8000",
     "https://django-next-frontend-ff.vercel.app"
 ]
 
